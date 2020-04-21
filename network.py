@@ -2,6 +2,7 @@ from tensorflow.keras.layers import (Conv2D, BatchNormalization, Activation,
                                      Dense, Softmax, Input, Flatten,
                                      MaxPooling2D, Dropout)
 from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.optimizers import Adam
 
 def conv_block(inputs, nfilters, filter_size, strides, use_batchnorm=True):
     x = Conv2D(nfilters, filter_size, strides)(inputs)
@@ -37,3 +38,7 @@ def init_model(params):
 
     model = Model(input_layer, output_layer)
     return model
+
+def init_adam(params):
+    adam = Adam(params['learning_rate'], params['beta1'], params['beta2'])
+    return adam
