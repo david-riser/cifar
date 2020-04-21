@@ -45,7 +45,7 @@ def train(model, params, X_train, Y_train, X_test, Y_test,
             down_rounds = 0
             model.save(savename)
             print("[New Best] Epoch {0}, Training Loss: {1:8.4f}, Testing Loss: {2:8.4f}".format(
-                epoch, train_loss[epoch], valid_loss[epoch]))
+                epoch, t_loss[epoch], v_loss[epoch]))
         else:
             down_rounds += 1
 

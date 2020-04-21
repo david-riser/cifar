@@ -3,6 +3,8 @@ import argparse
 import numpy as np
 import pandas as pd
 import os
+import glob
+import pickle
 
 # Keras import
 from tensorflow.keras.datasets import cifar10, cifar100
@@ -15,7 +17,22 @@ from train import train
 
 if __name__ == "__main__":
 
+    # Setup directory tree
+    make_directory('baseline/')
+    make_directory('baseline/model/')
+    make_directory('baseline/metrics/')
+    make_directory('baseline/params/')
 
+    # Determine trail index
+    trial_id = 0 
+    models = glob.glob('baseline/model/*.h5')
+    for model in models:
+        index = int(model.split('.')[1])
+        if index >= trial_id:
+            trial_id = index + 1
+    print('Performing trial {}'.format(trial_id))
+    savename = 'baseline/model/model.{}.h5'.format(trial_id)
+    
     # Load dataset
     (X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
     Y_train, Y_test = to_categorical(Y_train), to_categorical(Y_test)
@@ -46,19 +63,20 @@ if __name__ == "__main__":
     # Train but reserve the last little bit of data for
     # a final testing set.
     t_loss, v_loss = train(model, params, X_train, Y_train, X_test[:6000], Y_test[:6000],
-                           patience=10, savename='baseline/model/model.h5')
+                           patience=10, savename=savename)
 
-    make_directory('baseline/')
-    make_directory('baseline/model/')
-    make_directory('baseline/metrics/')
 
-    if not os.path.exists('baseline/model/model.h5'):
-        model.save('baseline/model/model.h5')
+    if not os.path.exists(savename):
+        model.save(savename)
 
     data = {'train_loss':t_loss, 'valid_loss':v_loss}
     df = pd.DataFrame(data)
-    df.to_csv('baseline/metrics/metrics.csv', index=False)
+    df.to_csv('baseline/metrics/metrics.{}.csv'.format(trial_id), index=False)
 
     # Print final testing loss
     test_loss = model.evaluate(X_test[6000:], Y_test[6000:])
     print("Final testing loss {0:8.4f}".format(test_loss))
+
+    # Save params
+    with open('baseline/params/params.{}.pkl'.format(trial_id), 'wb') as output_file:
+        pickle.dump(params, output_file)
