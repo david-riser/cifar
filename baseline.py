@@ -5,6 +5,7 @@ import pandas as pd
 import os
 import glob
 import pickle
+import time
 
 # Keras import
 from tensorflow.keras.datasets import cifar10, cifar100
@@ -65,7 +66,7 @@ if __name__ == "__main__":
     t_loss, v_loss = train(model, params, X_train, Y_train, X_test[:6000], Y_test[:6000],
                            patience=10, savename=savename)
 
-
+    # Save if it is not saved
     if not os.path.exists(savename):
         model.save(savename)
 
@@ -80,3 +81,18 @@ if __name__ == "__main__":
     # Save params
     with open('baseline/params/params.{}.pkl'.format(trial_id), 'wb') as output_file:
         pickle.dump(params, output_file)
+
+    # Write metafile
+    meta_cols = ['dropout', 'batch_size', 'max_epochs', 'depth', 'dense_neurons', 'init_filters',
+                 'use_batchnorm', 'learning_rate', 'beta1', 'beta2']
+    meta_data = {k:v for k,v in params.items() if k in meta_cols}
+    if not os.path.exists('baseline/meta.csv'):
+        meta_df = pd.DataFrame({'id':trial_id, 'time':time.time(), 'test_loss':test_loss, 'epochs':len(t_loss), **meta_data},
+                               index=[trial_id,])
+        meta_df.to_csv('baseline/meta.csv', index=False)
+    else:
+        meta_df = pd.read_csv('baseline/meta.csv')
+        new_meta = pd.DataFrame({'id':trial_id, 'time':time.time(), 'test_loss':test_loss, 'epochs':len(t_loss), **meta_data},
+                                index=[trial_id,])
+        out_df = pd.concat([meta_df, new_meta])
+        out_df.to_csv('baseline/meta.csv', index=False)
