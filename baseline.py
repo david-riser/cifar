@@ -10,6 +10,7 @@ import time
 # Keras import
 from tensorflow.keras.datasets import cifar10, cifar100
 from tensorflow.keras.utils import to_categorical
+from sklearn.metrics import accuracy_score
 
 # This project
 from common import make_directory, set_batches_per_epoch
@@ -35,7 +36,7 @@ if __name__ == "__main__":
     savename = 'baseline/model/model.{}.h5'.format(trial_id)
     
     # Load dataset
-    (X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
+    (X_train, Y_train), (X_test, Y_test) = cifar100.load_data(label_mode='fine')
     Y_train, Y_test = to_categorical(Y_train), to_categorical(Y_test)
     X_train, X_test = X_train / 255, X_test / 255
     
@@ -79,6 +80,11 @@ if __name__ == "__main__":
     test_loss = model.evaluate(X_test[6000:], Y_test[6000:])
     print("Final testing loss {0:8.4f}".format(test_loss))
 
+    # Top-k Accuracy
+    Y_pred = np.argmax(model.predict(X_test[6000:]), axis=1)
+    Y_true = np.argmax(Y_test[6000:], axis=1)
+    acc = accuracy_score(Y_true, Y_pred)
+    
     # Save params
     with open('baseline/params/params.{}.pkl'.format(trial_id), 'wb') as output_file:
         pickle.dump(params, output_file)
@@ -88,12 +94,12 @@ if __name__ == "__main__":
                  'use_batchnorm', 'learning_rate', 'beta1', 'beta2']
     meta_data = {k:v for k,v in params.items() if k in meta_cols}
     if not os.path.exists('baseline/meta.csv'):
-        meta_df = pd.DataFrame({'id':trial_id, 'time':time.time(), 'test_loss':test_loss, 'epochs':len(t_loss), **meta_data},
-                               index=[trial_id,])
+        meta_df = pd.DataFrame({'id':trial_id, 'time':time.time(), 'test_loss':test_loss,
+                                'epochs':len(t_loss), 'accuracy':acc, **meta_data}, index=[trial_id,])
         meta_df.to_csv('baseline/meta.csv', index=False)
     else:
         meta_df = pd.read_csv('baseline/meta.csv')
-        new_meta = pd.DataFrame({'id':trial_id, 'time':time.time(), 'test_loss':test_loss, 'epochs':len(t_loss), **meta_data},
-                                index=[trial_id,])
+        new_meta = pd.DataFrame({'id':trial_id, 'time':time.time(), 'test_loss':test_loss,
+                                'epochs':len(t_loss), 'accuracy':acc, **meta_data}, index=[trial_id,])
         out_df = pd.concat([meta_df, new_meta])
         out_df.to_csv('baseline/meta.csv', index=False)
