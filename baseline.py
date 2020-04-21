@@ -37,7 +37,8 @@ if __name__ == "__main__":
     # Load dataset
     (X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
     Y_train, Y_test = to_categorical(Y_train), to_categorical(Y_test)
-
+    X_train, X_test = X_train / 255, X_test / 255
+    
     # Baseline setup
     params = {
         'input_shape':X_train.shape[1:],
