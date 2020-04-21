@@ -1,0 +1,24 @@
+# Standard
+import argparse
+import numpy as np
+import pandas as pd
+import os
+
+# Keras import
+
+
+# This project
+from network import init_model
+from train import train
+
+if __name__ == "__main__":
+
+    params = {
+        'input_shape':(32,32,3),
+        'output_shape':10,
+        'depth':3,
+        'init_filters':32,
+        'use_batchnorm':False
+    }
+    model = init_model(params)
+    print(model.summary())
