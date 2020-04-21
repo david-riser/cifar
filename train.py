@@ -8,7 +8,8 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import top_k_categorical_accuracy
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-def train(model, params, X_train, Y_train, X_test, Y_test):
+def train(model, params, X_train, Y_train, X_test, Y_test,
+          patience=10, savename='model.h5'):
     """ Train the model according to the parameters given, this
     function is meant to work with sherpa. 
 
@@ -20,6 +21,10 @@ def train(model, params, X_train, Y_train, X_test, Y_test):
     - batch_size
     """
 
+    # Patience and Model Checkpointing
+    down_rounds = 0
+    best_loss = np.inf
+    
     t_loss, v_loss = [], []
     for epoch in range(params['max_epochs']):
         index = np.random.choice(np.arange(X_train.shape[0]), size=params['batch_size']*params['batches_per_epoch'])
@@ -33,6 +38,20 @@ def train(model, params, X_train, Y_train, X_test, Y_test):
 
         # Evaluate validation set
         v_loss.append(model.evaluate(X_test, Y_test))
+
+        # Model checkpoint and early stopping.
+        if v_loss[epoch] < best_loss:
+            best_loss = v_loss[epoch]
+            down_rounds = 0
+            model.save(savename)
+            print("[New Best] Epoch {0}, Training Loss: {1:8.4f}, Testing Loss: {2:8.4f}".format(
+                epoch, train_loss[epoch], valid_loss[epoch]))
+        else:
+            down_rounds += 1
+
+        if down_rounds >= patience:
+            print("Earlying stopping at epoch {}.".format(epoch))
+            break
 
     return t_loss, v_loss
 

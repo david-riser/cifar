@@ -29,9 +29,9 @@ def init_model(params):
             x = MaxPooling2D()(x)
 
     x = Flatten()(x)
-    x = Dense(128)(x)
+    x = Dense(params['dense_neurons'])(x)
     x = Activation('relu')(x)
-    x = Dropout(0.3)(x)
+    x = Dropout(params['dropout'])(x)
     x = Dense(params['output_shape'])(x)
     x = Activation('relu')(x)
     output_layer = Softmax()(x)
