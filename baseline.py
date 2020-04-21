@@ -10,6 +10,7 @@ import time
 # Keras import
 from tensorflow.keras.datasets import cifar10, cifar100
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.models import load_model
 from sklearn.metrics import accuracy_score
 
 # This project
@@ -46,13 +47,13 @@ if __name__ == "__main__":
         'output_shape':Y_train.shape[1],
         'depth':3,
         'dense_neurons':128,
-        'init_filters':32,
+        'init_filters':16,
         'use_batchnorm':True,
-        'dropout':0.2,
-        'batch_size':32,
-        'max_epochs':3,
-        'learning_rate':0.001,
-        'beta1':0.9,
+        'dropout':0.4,
+        'batch_size':128,
+        'max_epochs':100,
+        'learning_rate':0.0025,
+        'beta1':0.75,
         'beta2':0.999
     }
     params['batches_per_epoch'] = set_batches_per_epoch(params['batch_size'])
@@ -71,7 +72,9 @@ if __name__ == "__main__":
     # Save if it is not saved
     if not os.path.exists(savename):
         model.save(savename)
-
+    # Get best model 
+    model = load_model(savename)
+        
     data = {'train_loss':t_loss, 'valid_loss':v_loss}
     df = pd.DataFrame(data)
     df.to_csv('baseline/metrics/metrics.{}.csv'.format(trial_id), index=False)
