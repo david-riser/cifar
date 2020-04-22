@@ -72,6 +72,7 @@ if __name__ == "__main__":
     # Save if it is not saved
     if not os.path.exists(savename):
         model.save(savename)
+
     # Get best model 
     model = load_model(savename)
         
