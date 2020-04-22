@@ -56,7 +56,7 @@ def train(model, params, X_train, Y_train, X_test, Y_test,
         # This line is important for doing searches because
         # we keep wasting time in spaces where nothing is
         # happening at all.
-        if (epoch is 3) and (down_rounds is 2):
+        if (epoch == 3) and (down_rounds == 2):
             print("Earlying stopping because nothing is happening.")
             break
         

@@ -1,3 +1,4 @@
 *.tar
 *.pkl
 *.h5
+*.pyc
