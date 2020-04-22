@@ -65,6 +65,9 @@ if __name__ == "__main__":
         t_loss, v_loss = train(model, pars, X_train, Y_train, X_test[:6000], Y_test[:6000],
                                patience=10, savename=savename)
 
+        # Log
+        study.add_observation(trial=trial, iteration=0, objective=min(v_loss))
+
         # Save if it is not saved
         if not os.path.exists(savename):
             model.save(savename)
