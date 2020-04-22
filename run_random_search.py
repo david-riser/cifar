@@ -48,7 +48,7 @@ if __name__ == "__main__":
     #print(params)
 
     if algorithm is 'random-search':
-        sherpa_algo = sherpa.algorithms.RandomSearch(max_num_trials=2)
+        sherpa_algo = sherpa.algorithms.RandomSearch(max_num_trials=50)
     else:
         print('Algorithm {} not found!'.format(algorithm))
         exit()
