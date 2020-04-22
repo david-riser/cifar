@@ -24,7 +24,7 @@ from train import train
 
 if __name__ == "__main__":
 
-    algorithm = 'random-search'
+    algorithm = 'random-search-2'
     
     # Setup directory tree
     make_directory('{}/'.format(algorithm))
@@ -44,15 +44,8 @@ if __name__ == "__main__":
         'output_shape':Y_train.shape[1],
         'max_epochs':100,
     }
-    #extra_params['batches_per_epoch'] = set_batches_per_epoch(params['batch_size'])
-    #print(params)
 
-    if algorithm is 'random-search':
-        sherpa_algo = sherpa.algorithms.RandomSearch(max_num_trials=50)
-    else:
-        print('Algorithm {} not found!'.format(algorithm))
-        exit()
-
+    sherpa_algo = sherpa.algorithms.RandomSearch(max_num_trials=50)
     study = sherpa.Study(parameters=params, algorithm=sherpa_algo, lower_is_better=True)
     for trial in study:
         trial_id = trial.id

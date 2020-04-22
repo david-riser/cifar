@@ -53,6 +53,13 @@ def train(model, params, X_train, Y_train, X_test, Y_test,
             print("Earlying stopping at epoch {}.".format(epoch))
             break
 
+        # This line is important for doing searches because
+        # we keep wasting time in spaces where nothing is
+        # happening at all.
+        if (epoch is 3) and (down_rounds is 2):
+            print("Earlying stopping because nothing is happening.")
+            break
+        
     return t_loss, v_loss
 
 def train_model_with_augmentations(model, datagen, X_test, Y_test,
