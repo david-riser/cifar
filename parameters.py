@@ -13,3 +13,13 @@ def build_sherpa_parameter_space():
         sherpa.Continuous(name='beta2', range=[0.95, 1.0])
     ]
     return params
+
+def build_sherpa_augmentations_space():
+    params = [
+        sherpa.Continuous(name='width_shift', range=[0.0, 0.2]),
+        sherpa.Continuous(name='height_shift', range=[0.0, 0.2]),
+        sherpa.Continuous(name='zoom', range=[0.0, 0.3]),
+        sherpa.Choice(name='horizontal_flip', range=[False, True]),
+        sherpa.Discrete(name='rotation', range=[0, 30])
+    ]
+    return params

@@ -8,8 +8,8 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import top_k_categorical_accuracy
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-def train(model, params, X_train, Y_train, X_test, Y_test,
-          patience=10, savename='model.h5'):
+def train(model, params, X_train, Y_train, X_test, Y_test, 
+          patience=10, savename='model.h5', datagen=None):
     """ Train the model according to the parameters given, this
     function is meant to work with sherpa. 
 
@@ -21,17 +21,30 @@ def train(model, params, X_train, Y_train, X_test, Y_test,
     - batch_size
     """
 
+    # If we have a generator we will train with
+    # augmentations.
+    if datagen:
+        data_flow = datagen.flow(
+            X_train, Y_train,
+            batch_size=params['batch_size'], shuffle=True
+        )
+    
     # Patience and Model Checkpointing
     down_rounds = 0
     best_loss = np.inf
     
     t_loss, v_loss = [], []
     for epoch in range(params['max_epochs']):
-        index = np.random.choice(np.arange(X_train.shape[0]), size=params['batch_size']*params['batches_per_epoch'])
+        index = np.random.choice(np.arange(X_train.shape[0]),
+                                 size=params['batch_size']*params['batches_per_epoch'])
         batch_loss = 0.
         for batch in range(params['batches_per_epoch']):
-            batch_index = index[batch * params['batch_size']:(batch+1) * params['batch_size']]
-            batch_loss += model.train_on_batch(X_train[batch_index], Y_train[batch_index])
+            if datagen:
+                X_batch, Y_batch = next(data_flow)
+                batch_loss += model.train_on_batch(X_batch, Y_batch)
+            else:
+                batch_index = index[batch * params['batch_size']:(batch+1) * params['batch_size']]
+                batch_loss += model.train_on_batch(X_train[batch_index], Y_train[batch_index])
 
         # Training loss from above
         t_loss.append(batch_loss / params['batches_per_epoch'])

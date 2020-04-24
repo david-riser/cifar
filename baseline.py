@@ -46,14 +46,14 @@ if __name__ == "__main__":
         'input_shape':X_train.shape[1:],
         'output_shape':Y_train.shape[1],
         'depth':3,
-        'dense_neurons':128,
-        'init_filters':16,
+        'dense_neurons':512,
+        'init_filters':20,
         'use_batchnorm':True,
         'dropout':0.4,
         'batch_size':128,
-        'max_epochs':100,
-        'learning_rate':0.0025,
-        'beta1':0.75,
+        'max_epochs':5,
+        'learning_rate':0.008,
+        'beta1':0.5,
         'beta2':0.999
     }
     params['batches_per_epoch'] = set_batches_per_epoch(params['batch_size'])

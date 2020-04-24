@@ -3,6 +3,7 @@ from tensorflow.keras.layers import (Conv2D, BatchNormalization, Activation,
                                      MaxPooling2D, Dropout)
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 def conv_block(inputs, nfilters, filter_size, strides, use_batchnorm=True):
     x = Conv2D(nfilters, filter_size, strides)(inputs)
@@ -42,3 +43,13 @@ def init_model(params):
 def init_adam(params):
     adam = Adam(params['learning_rate'], params['beta1'], params['beta2'])
     return adam
+
+def init_datagen(params):
+    datagen = ImageDataGenerator(
+        rotation_range=params['rotation'],
+        width_shift_range=params['width_shift'],
+        height_shift_range=params['height_shift'],
+        zoom_range=params['zoom'],
+        horizontal_flip=params['horizontal_flip']
+    )
+    return datagen
